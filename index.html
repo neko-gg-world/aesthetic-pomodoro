@@ -34,7 +34,6 @@
       overflow:hidden;
     }
 
-    /* floating blobs (website-ish aesthetic motion) */
     .blob{
       position:absolute;
       width:520px; height:520px;
@@ -54,7 +53,6 @@
       50%{ transform: translate(25px,-18px) scale(1.05); }
     }
 
-    /* layout */
     .wrap{
       position:relative;
       z-index:2;
@@ -190,9 +188,9 @@
       margin-top: 18px;
       color: var(--muted);
       font-size: 12px;
+      line-height: 1.4;
     }
 
-    /* tiny “shake” when you try to start at 00:00 */
     .shake{
       animation: shake .25s ease;
     }
@@ -231,12 +229,14 @@
 
       <button class="reset" id="resetBtn">Reset</button>
 
-      <div class="footer">made with 🍓 + focus</div>
+      <div class="footer">
+        made with 🍓 + focus<br>
+        <strong>dont forget to get some water after every 25 mins hamster</strong>
+      </div>
     </div>
   </div>
 
   <script>
-    // ---- Pomodoro settings (edit later if you want) ----
     const WORK_SECONDS = 25 * 60;
     const BREAK_SECONDS = 5 * 60;
 
@@ -263,7 +263,7 @@
     function setModeUI(){
       if(onBreak){
         modeTextEl.textContent = "BREAK";
-        dotEl.style.background = "#7bdcb5";                 // mint
+        dotEl.style.background = "#7bdcb5";
         dotEl.style.boxShadow = "0 0 0 6px rgba(123,220,181,.18)";
       }else{
         modeTextEl.textContent = "WORK";
@@ -277,11 +277,53 @@
       setModeUI();
     }
 
+    // ---- Cute sounds (no audio files) ----
+    let audioCtx = null;
+
+    function ensureAudio(){
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(audioCtx.state === "suspended"){
+        audioCtx.resume();
+      }
+    }
+
+    function beep({freq=880, duration=0.09, type="sine", volume=0.05} = {}){
+      ensureAudio();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.value = volume;
+
+      o.connect(g);
+      g.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+      g.gain.setValueAtTime(volume, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      o.start(now);
+      o.stop(now + duration);
+    }
+
+    function playResetSound(){
+      beep({freq: 740, duration: 0.07, type:"sine", volume:0.05});
+      setTimeout(() => beep({freq: 990, duration: 0.07, type:"sine", volume:0.05}), 90);
+    }
+
+    function playDoneSound(){
+      beep({freq: 660, duration: 0.10, type:"triangle", volume:0.05});
+      setTimeout(() => beep({freq: 880, duration: 0.10, type:"triangle", volume:0.05}), 120);
+      setTimeout(() => beep({freq: 990, duration: 0.14, type:"triangle", volume:0.05}), 250);
+    }
+
     function tick(){
       if(!running) return;
 
       if(secondsLeft <= 0){
-        // switch modes automatically
+        playDoneSound();
         onBreak = !onBreak;
         secondsLeft = onBreak ? BREAK_SECONDS : WORK_SECONDS;
         render();
@@ -295,7 +337,6 @@
     function start(){
       if(running) return;
 
-      // if at 00:00, give a cute feedback
       if(secondsLeft <= 0){
         cardEl.classList.remove("shake");
         void cardEl.offsetWidth;
@@ -320,6 +361,7 @@
       onBreak = false;
       secondsLeft = WORK_SECONDS;
       render();
+      playResetSound();
     }
 
     startBtn.addEventListener("click", start);
@@ -330,4 +372,3 @@
   </script>
 </body>
 </html>
-
