@@ -1,299 +1,550 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Aesthetic Pomodoro 🍓</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Aesthetic Pomodoro 🍓</title>
 
-<style>
-:root{
-  --text:#2a2a2a;
-  --muted:#7a7a7a;
-  --pink:#ff7eb6;
-  --pinkHover:#ff6aa9;
-  --mint:#7bdcb5;
-  --border:#f3d6e2;
-  --soft:#f7f1f4;
-  --softHover:#efe6eb;
-}
+  <!-- Share preview (OpenGraph / Twitter) -->
+  <meta name="description" content="Aesthetic Pomodoro timer 🍓 Cozy focus + cute breaks." />
+  <meta property="og:title" content="Aesthetic Pomodoro 🍓" />
+  <meta property="og:description" content="Cozy focus timer with cute breaks + hydration reminder 🐹💧" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://neko-gg-world.github.io/aesthetic-pomodoro/" />
+  <meta property="og:image" content="https://neko-gg-world.github.io/aesthetic-pomodoro/bg.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Aesthetic Pomodoro 🍓" />
+  <meta name="twitter:description" content="Cozy focus timer with cute breaks + hydration reminder 🐹💧" />
+  <meta name="twitter:image" content="https://neko-gg-world.github.io/aesthetic-pomodoro/bg.jpg" />
 
-/* ---------- PAGE ---------- */
-body{
-  margin:0;
-  min-height:100vh;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  color:var(--text);
-  overflow:hidden;
-}
+  <style>
+    :root{
+      --text:#2a2a2a;
+      --muted:#6f6f6f;
 
-/* background layers */
-.bg{
-  position:fixed;
-  inset:0;
-  background:
-    linear-gradient(rgba(255,245,248,.85), rgba(255,245,248,.85)),
-    url("bg.jpg") center / cover no-repeat fixed;
-  transition: background .6s ease;
-  z-index:-1;
-}
+      --pink:#ff7eb6;
+      --pinkHover:#ff6aa9;
+      --mint:#7bdcb5;
 
-.bg.break{
-  background:
-    linear-gradient(rgba(235,255,245,.85), rgba(235,255,245,.85)),
-    url("bg.jpg") center / cover no-repeat fixed;
-}
+      --border:#f3d6e2;
+      --soft:#f7f1f4;
+      --softHover:#efe6eb;
 
-/* ---------- LAYOUT ---------- */
-.wrap{
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  padding:20px;
-}
+      --card: rgba(255,255,255,.76);
+      --shadow: 0 25px 80px rgba(0,0,0,.15);
 
-/* ---------- CARD ---------- */
-.card{
-  width:100%;
-  max-width:420px;
-  background: rgba(255,255,255,.75);
-  backdrop-filter: blur(16px);
-  border:2px solid var(--border);
-  border-radius:28px;
-  box-shadow:0 25px 80px rgba(0,0,0,.15);
-  padding:26px 22px;
-  text-align:center;
-  transition:.25s;
-}
+      /* overlays */
+      --overlay-work: rgba(255,245,248,.85);
+      --overlay-break: rgba(235,255,245,.85);
 
-/* ---------- TEXT ---------- */
-.title{
-  font-size:26px;
-  font-weight:800;
-  text-transform: lowercase;
-}
+      /* night mode overlays */
+      --overlay-work-night: rgba(20,18,30,.65);
+      --overlay-break-night: rgba(16,28,24,.65);
 
-.subtitle{
-  font-size:14px;
-  color:var(--muted);
-  margin-bottom:18px;
-}
+      --border-night: rgba(255,255,255,.14);
+      --card-night: rgba(20,18,30,.55);
+      --text-night: #f2f2f6;
+      --muted-night:#b7b7c4;
+      --soft-night: rgba(255,255,255,.10);
+      --softHover-night: rgba(255,255,255,.16);
+      --shadow-night: 0 25px 90px rgba(0,0,0,.45);
+    }
 
-.timer{
-  font-size:clamp(56px, 18vw, 76px);
-  font-weight:900;
-  letter-spacing:1px;
-  margin:12px 0 6px;
-  font-variant-numeric: tabular-nums;
-}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
+      overflow:hidden;
+    }
 
-.mode{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:8px 14px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#ffffffaa;
-  font-size:13px;
-  font-weight:700;
-  margin-bottom:20px;
-}
+    /* background layer */
+    .bg{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:
+        linear-gradient(var(--overlay-work), var(--overlay-work)),
+        url("bg.jpg") center / cover no-repeat fixed;
+      transition: background .6s ease;
+    }
 
-.dot{
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:var(--pink);
-  box-shadow:0 0 0 6px rgba(255,126,182,.2);
-}
+    .bg.break{
+      background:
+        linear-gradient(var(--overlay-break), var(--overlay-break)),
+        url("bg.jpg") center / cover no-repeat fixed;
+    }
 
-/* ---------- BUTTONS ---------- */
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-bottom:12px;
-}
+    /* night mode */
+    body.night{
+      color: var(--text-night);
+    }
 
-button{
-  border:none;
-  height:50px;
-  border-radius:16px;
-  font-weight:700;
-  font-size:16px;
-  cursor:pointer;
-  transition:.15s;
-}
+    body.night .bg{
+      background:
+        linear-gradient(var(--overlay-work-night), var(--overlay-work-night)),
+        url("bg.jpg") center / cover no-repeat fixed;
+    }
+    body.night .bg.break{
+      background:
+        linear-gradient(var(--overlay-break-night), var(--overlay-break-night)),
+        url("bg.jpg") center / cover no-repeat fixed;
+    }
 
-button:active{ transform:scale(.97); }
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:20px;
+    }
 
-.primary{
-  background:var(--pink);
-  color:white;
-}
-.primary:hover{ background:var(--pinkHover); }
+    .card{
+      width:100%;
+      max-width:420px;
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      border:2px solid var(--border);
+      border-radius:28px;
+      box-shadow: var(--shadow);
+      padding:26px 22px;
+      text-align:center;
+      transition:.25s;
+    }
 
-.soft{
-  background:var(--soft);
-}
-.soft:hover{ background:var(--softHover); }
+    body.night .card{
+      background: var(--card-night);
+      border-color: var(--border-night);
+      box-shadow: var(--shadow-night);
+    }
 
-.reset{
-  width:100%;
-  background:white;
-  border:2px solid var(--border);
-}
+    .card:hover{ transform: translateY(-3px); }
 
-/* ---------- FOOTER ---------- */
-.footer{
-  margin-top:16px;
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.4;
-}
+    .title{
+      font-size:26px;
+      font-weight:850;
+      text-transform: lowercase;
+      letter-spacing:.3px;
+    }
 
-/* ---------- SHAKE ---------- */
-.shake{
-  animation:shake .25s;
-}
-@keyframes shake{
-  0%,100%{transform:translateX(0);}
-  25%{transform:translateX(-6px);}
-  75%{transform:translateX(6px);}
-}
+    .subtitle{
+      font-size:14px;
+      color: var(--muted);
+      margin: 6px 0 18px;
+    }
+    body.night .subtitle{ color: var(--muted-night); }
 
-/* ---------- MOBILE TWEAKS ---------- */
-@media (max-height:700px){
-  .subtitle{ display:none; }
-}
-</style>
+    .timer{
+      font-size: clamp(56px, 18vw, 76px);
+      font-weight: 950;
+      letter-spacing: 1px;
+      margin: 10px 0 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .modeRow{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      margin-bottom:18px;
+    }
+
+    .mode{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#ffffffaa;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+
+    body.night .mode{
+      border-color: var(--border-night);
+      background: rgba(255,255,255,.08);
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background: var(--pink);
+      box-shadow:0 0 0 6px rgba(255,126,182,.22);
+    }
+
+    /* heart that pulses on break */
+    .heart{
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--border);
+      background:#ffffffaa;
+      user-select:none;
+      opacity:.85;
+      transform: translateY(0);
+    }
+    body.night .heart{
+      border-color: var(--border-night);
+      background: rgba(255,255,255,.08);
+    }
+
+    .heart span{ font-size:16px; line-height:1; }
+    .heart.pulse{
+      animation: pulse 1.1s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: scale(1); }
+      50%{ transform: scale(1.12); }
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    button{
+      border:none;
+      height:50px;
+      border-radius:16px;
+      font-weight:800;
+      font-size:16px;
+      cursor:pointer;
+      transition:.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:active{ transform: scale(.97); }
+
+    .primary{
+      background: var(--pink);
+      color:white;
+    }
+    .primary:hover{ background: var(--pinkHover); }
+
+    .soft{
+      background: var(--soft);
+      color: var(--text);
+    }
+    .soft:hover{ background: var(--softHover); }
+
+    body.night .soft{
+      background: var(--soft-night);
+      color: var(--text-night);
+    }
+    body.night .soft:hover{
+      background: var(--softHover-night);
+    }
+
+    .reset{
+      width:100%;
+      background:white;
+      border:2px solid var(--border);
+      color: var(--text);
+    }
+    body.night .reset{
+      background: rgba(255,255,255,.08);
+      border-color: var(--border-night);
+      color: var(--text-night);
+    }
+
+    .meta{
+      margin-top: 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      font-size:12px;
+      color: var(--muted);
+    }
+    body.night .meta{ color: var(--muted-night); }
+
+    .pillSmall{
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #ffffffaa;
+      font-weight:800;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      cursor:pointer;
+      user-select:none;
+    }
+    body.night .pillSmall{
+      border-color: var(--border-night);
+      background: rgba(255,255,255,.08);
+    }
+
+    .footer{
+      margin-top:16px;
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.4;
+    }
+    body.night .footer{ color: var(--muted-night); }
+
+    .shake{ animation: shake .25s; }
+    @keyframes shake{
+      0%,100%{ transform: translateX(0); }
+      25%{ transform: translateX(-6px); }
+      75%{ transform: translateX(6px); }
+    }
+
+    /* mobile tweak */
+    @media (max-height:700px){
+      .subtitle{ display:none; }
+    }
+  </style>
 </head>
 
 <body>
-<div class="bg" id="bg"></div>
+  <div class="bg" id="bg"></div>
 
-<div class="wrap">
-  <div class="card" id="card">
+  <div class="wrap">
+    <div class="card" id="card">
+      <div class="title">pomodoro</div>
+      <div class="subtitle">soft focus • cozy breaks • repeat</div>
 
-    <div class="title">pomodoro</div>
-    <div class="subtitle">soft focus • cozy breaks • repeat</div>
+      <div class="timer" id="timer">25:00</div>
 
-    <div class="timer" id="timer">25:00</div>
+      <div class="modeRow">
+        <div class="mode">
+          <span class="dot" id="dot"></span>
+          <span id="modeText">WORK</span>
+        </div>
+        <div class="heart" id="heart" title="break vibes"><span>💗</span></div>
+      </div>
 
-    <div class="mode">
-      <span class="dot" id="dot"></span>
-      <span id="modeText">WORK</span>
+      <div class="row">
+        <button class="primary" id="startBtn">Start</button>
+        <button class="soft" id="pauseBtn">Pause</button>
+      </div>
+
+      <button class="reset" id="resetBtn">Reset</button>
+
+      <div class="meta">
+        <div id="sessionsText">Pomodoros today: 0</div>
+        <div class="pillSmall" id="shareBtn">Share ✨</div>
+      </div>
+
+      <div class="footer">
+        made with 🍓 + focus<br>
+        <strong>dont forget to get some water after every 25 mins hamster</strong>
+      </div>
     </div>
-
-    <div class="row">
-      <button class="primary" id="startBtn">Start</button>
-      <button class="soft" id="pauseBtn">Pause</button>
-    </div>
-
-    <button class="reset" id="resetBtn">Reset</button>
-
-    <div class="footer">
-      made with 🍓 + focus<br>
-      <strong>dont forget to get some water after every 25 mins hamster</strong>
-    </div>
-
   </div>
-</div>
 
-<script>
-/* ---------- TIMER ---------- */
-const WORK = 25 * 60;
-const BREAK = 5 * 60;
+  <script>
+    // ---------- SETTINGS ----------
+    const WORK = 25 * 60;
+    const BREAK = 5 * 60;
 
-let seconds = WORK;
-let running = false;
-let onBreak = false;
-let interval = null;
+    // ---------- STATE ----------
+    let seconds = WORK;
+    let running = false;
+    let onBreak = false;
+    let interval = null;
 
-const timer = document.getElementById("timer");
-const modeText = document.getElementById("modeText");
-const dot = document.getElementById("dot");
-const card = document.getElementById("card");
-const bg = document.getElementById("bg");
+    // ---------- ELEMENTS ----------
+    const timerEl = document.getElementById("timer");
+    const modeTextEl = document.getElementById("modeText");
+    const dotEl = document.getElementById("dot");
+    const cardEl = document.getElementById("card");
+    const bgEl = document.getElementById("bg");
+    const heartEl = document.getElementById("heart");
+    const sessionsTextEl = document.getElementById("sessionsText");
+    const shareBtn = document.getElementById("shareBtn");
 
-function fmt(s){
-  return String(Math.floor(s/60)).padStart(2,"0") + ":" +
-         String(s%60).padStart(2,"0");
-}
+    // ---------- NIGHT MODE (auto) ----------
+    function applyNightMode(){
+      const h = new Date().getHours();
+      const isNight = (h >= 19 || h < 7); // 7pm - 7am
+      document.body.classList.toggle("night", isNight);
+    }
+    applyNightMode();
+    setInterval(applyNightMode, 60_000); // re-check every minute
 
-function render(){
-  timer.textContent = fmt(seconds);
-  if(onBreak){
-    modeText.textContent = "BREAK";
-    dot.style.background = "var(--mint)";
-    dot.style.boxShadow = "0 0 0 6px rgba(123,220,181,.25)";
-    bg.classList.add("break");
-  }else{
-    modeText.textContent = "WORK";
-    dot.style.background = "var(--pink)";
-    dot.style.boxShadow = "0 0 0 6px rgba(255,126,182,.25)";
-    bg.classList.remove("break");
-  }
-}
+    // ---------- DAILY SESSION COUNTER ----------
+    function todayKey(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
-/* ---------- SOUNDS ---------- */
-let audioCtx;
-function beep(freq,dur){
-  audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.frequency.value=freq;
-  o.connect(g); g.connect(audioCtx.destination);
-  g.gain.value=.05;
-  o.start(); o.stop(audioCtx.currentTime+dur);
-}
-function resetSound(){
-  beep(740,.07); setTimeout(()=>beep(990,.07),90);
-}
-function doneSound(){
-  beep(660,.1); setTimeout(()=>beep(880,.1),120); setTimeout(()=>beep(990,.14),250);
-}
+    const STORAGE_KEY = "pomodoro_daily_sessions_v1";
 
-/* ---------- CONTROLS ---------- */
-function tick(){
-  if(!running) return;
-  if(seconds<=0){
-    doneSound();
-    onBreak=!onBreak;
-    seconds=onBreak?BREAK:WORK;
+    function getDailySessions(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return { date: todayKey(), count: 0 };
+        const obj = JSON.parse(raw);
+        if(obj.date !== todayKey()) return { date: todayKey(), count: 0 };
+        return { date: obj.date, count: Number(obj.count || 0) };
+      }catch{
+        return { date: todayKey(), count: 0 };
+      }
+    }
+
+    function setDailySessions(count){
+      const payload = { date: todayKey(), count: count };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      sessionsTextEl.textContent = `Pomodoros today: ${count}`;
+    }
+
+    let daily = getDailySessions();
+    setDailySessions(daily.count);
+
+    // ---------- HELPERS ----------
+    function fmt(s){
+      const m = Math.floor(s/60);
+      const r = s % 60;
+      return `${String(m).padStart(2,"0")}:${String(r).padStart(2,"0")}`;
+    }
+
+    function setModeUI(){
+      if(onBreak){
+        modeTextEl.textContent = "BREAK";
+        dotEl.style.background = "var(--mint)";
+        dotEl.style.boxShadow = "0 0 0 6px rgba(123,220,181,.25)";
+        bgEl.classList.add("break");
+        heartEl.classList.add("pulse");
+      }else{
+        modeTextEl.textContent = "WORK";
+        dotEl.style.background = "var(--pink)";
+        dotEl.style.boxShadow = "0 0 0 6px rgba(255,126,182,.25)";
+        bgEl.classList.remove("break");
+        heartEl.classList.remove("pulse");
+      }
+    }
+
+    function render(){
+      timerEl.textContent = fmt(seconds);
+      setModeUI();
+    }
+
+    // ---------- SOUNDS (no files) ----------
+    let audioCtx;
+
+    function beep({freq=880, duration=0.09, volume=0.05, type="sine"} = {}){
+      audioCtx ||= new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+
+      o.connect(g);
+      g.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+      g.gain.setValueAtTime(volume, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      o.start(now);
+      o.stop(now + duration);
+    }
+
+    function resetSound(){
+      beep({freq:740, duration:0.07, type:"sine"});
+      setTimeout(()=>beep({freq:990, duration:0.07, type:"sine"}), 90);
+    }
+
+    function doneSound(){
+      beep({freq:660, duration:0.10, type:"triangle"});
+      setTimeout(()=>beep({freq:880, duration:0.10, type:"triangle"}), 120);
+      setTimeout(()=>beep({freq:990, duration:0.14, type:"triangle"}), 250);
+    }
+
+    // ---------- TIMER ----------
+    function tick(){
+      if(!running) return;
+
+      // keep daily counter fresh across midnight
+      const current = getDailySessions();
+      if(current.date !== daily.date){
+        daily = current;
+        setDailySessions(daily.count);
+      }
+
+      if(seconds <= 0){
+        doneSound();
+
+        // If we finished a WORK session -> count a pomodoro
+        if(!onBreak){
+          daily.count += 1;
+          setDailySessions(daily.count);
+        }
+
+        onBreak = !onBreak;
+        seconds = onBreak ? BREAK : WORK;
+        render();
+        return;
+      }
+
+      seconds -= 1;
+      render();
+    }
+
+    function start(){
+      if(running) return;
+
+      if(seconds <= 0){
+        cardEl.classList.remove("shake"); void cardEl.offsetWidth;
+        cardEl.classList.add("shake");
+        return;
+      }
+
+      running = true;
+      interval = setInterval(tick, 1000);
+    }
+
+    function pause(){
+      running = false;
+      if(interval){
+        clearInterval(interval);
+        interval = null;
+      }
+    }
+
+    function reset(){
+      pause();
+      onBreak = false;
+      seconds = WORK;
+      render();
+      resetSound();
+    }
+
+    // ---------- SHARE ----------
+    async function share(){
+      const url = "https://neko-gg-world.github.io/aesthetic-pomodoro/";
+      const text = "Aesthetic Pomodoro 🍓 (don’t forget water, hamster 🐹💧)";
+      try{
+        if(navigator.share){
+          await navigator.share({ title: "Aesthetic Pomodoro 🍓", text, url });
+        }else{
+          await navigator.clipboard.writeText(url);
+          shareBtn.textContent = "Copied ✅";
+          setTimeout(()=>shareBtn.textContent = "Share ✨", 1200);
+        }
+      }catch{
+        // user cancelled share; do nothing
+      }
+    }
+
+    // ---------- HOOK UP BUTTONS ----------
+    document.getElementById("startBtn").addEventListener("click", start);
+    document.getElementById("pauseBtn").addEventListener("click", pause);
+    document.getElementById("resetBtn").addEventListener("click", reset);
+    shareBtn.addEventListener("click", share);
+
     render();
-    return;
-  }
-  seconds--;
-  render();
-}
-
-startBtn.onclick=()=>{
-  if(running) return;
-  if(seconds<=0){
-    card.classList.remove("shake"); void card.offsetWidth;
-    card.classList.add("shake"); return;
-  }
-  running=true;
-  interval=setInterval(tick,1000);
-};
-
-pauseBtn.onclick=()=>{
-  running=false;
-  clearInterval(interval);
-};
-
-resetBtn.onclick=()=>{
-  running=false;
-  clearInterval(interval);
-  onBreak=false;
-  seconds=WORK;
-  render();
-  resetSound();
-};
-
-render();
-</script>
+  </script>
 </body>
 </html>
-
