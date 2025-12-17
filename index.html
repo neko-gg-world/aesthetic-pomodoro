@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Aesthetic Pomodoro 🍓</title>
 
 <style>
@@ -11,6 +11,7 @@
   --muted:#7a7a7a;
   --pink:#ff7eb6;
   --pinkHover:#ff6aa9;
+  --mint:#7bdcb5;
   --border:#f3d6e2;
   --soft:#f7f1f4;
   --softHover:#efe6eb;
@@ -22,41 +23,51 @@ body{
   min-height:100vh;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
   color:var(--text);
-
-  background:
-    linear-gradient(rgba(255,245,248,0.85), rgba(255,245,248,0.85)),
-    url("bg.jpg") center / cover no-repeat fixed;
-
   overflow:hidden;
 }
 
+/* background layers */
+.bg{
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(rgba(255,245,248,.85), rgba(255,245,248,.85)),
+    url("bg.jpg") center / cover no-repeat fixed;
+  transition: background .6s ease;
+  z-index:-1;
+}
+
+.bg.break{
+  background:
+    linear-gradient(rgba(235,255,245,.85), rgba(235,255,245,.85)),
+    url("bg.jpg") center / cover no-repeat fixed;
+}
+
+/* ---------- LAYOUT ---------- */
 .wrap{
   min-height:100vh;
   display:grid;
   place-items:center;
-  padding:24px;
+  padding:20px;
 }
 
 /* ---------- CARD ---------- */
 .card{
-  width:min(420px, 92vw);
-  background: rgba(255,255,255,0.75);
+  width:100%;
+  max-width:420px;
+  background: rgba(255,255,255,.75);
   backdrop-filter: blur(16px);
   border:2px solid var(--border);
   border-radius:28px;
   box-shadow:0 25px 80px rgba(0,0,0,.15);
-  padding:28px 26px;
+  padding:26px 22px;
   text-align:center;
   transition:.25s;
 }
 
-.card:hover{
-  transform: translateY(-3px);
-}
-
 /* ---------- TEXT ---------- */
 .title{
-  font-size:28px;
+  font-size:26px;
   font-weight:800;
   text-transform: lowercase;
 }
@@ -64,14 +75,14 @@ body{
 .subtitle{
   font-size:14px;
   color:var(--muted);
-  margin-bottom:20px;
+  margin-bottom:18px;
 }
 
 .timer{
-  font-size:76px;
+  font-size:clamp(56px, 18vw, 76px);
   font-weight:900;
   letter-spacing:1px;
-  margin:16px 0 8px;
+  margin:12px 0 6px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -85,7 +96,7 @@ body{
   background:#ffffffaa;
   font-size:13px;
   font-weight:700;
-  margin-bottom:22px;
+  margin-bottom:20px;
 }
 
 .dot{
@@ -106,33 +117,26 @@ body{
 
 button{
   border:none;
-  height:48px;
+  height:50px;
   border-radius:16px;
   font-weight:700;
+  font-size:16px;
   cursor:pointer;
   transition:.15s;
 }
 
-button:active{
-  transform:scale(.98);
-}
+button:active{ transform:scale(.97); }
 
 .primary{
   background:var(--pink);
   color:white;
 }
-
-.primary:hover{
-  background:var(--pinkHover);
-}
+.primary:hover{ background:var(--pinkHover); }
 
 .soft{
   background:var(--soft);
 }
-
-.soft:hover{
-  background:var(--softHover);
-}
+.soft:hover{ background:var(--softHover); }
 
 .reset{
   width:100%;
@@ -142,7 +146,7 @@ button:active{
 
 /* ---------- FOOTER ---------- */
 .footer{
-  margin-top:18px;
+  margin-top:16px;
   font-size:12px;
   color:var(--muted);
   line-height:1.4;
@@ -152,16 +156,22 @@ button:active{
 .shake{
   animation:shake .25s;
 }
-
 @keyframes shake{
   0%,100%{transform:translateX(0);}
   25%{transform:translateX(-6px);}
   75%{transform:translateX(6px);}
 }
+
+/* ---------- MOBILE TWEAKS ---------- */
+@media (max-height:700px){
+  .subtitle{ display:none; }
+}
 </style>
 </head>
 
 <body>
+<div class="bg" id="bg"></div>
+
 <div class="wrap">
   <div class="card" id="card">
 
@@ -191,7 +201,7 @@ button:active{
 </div>
 
 <script>
-/* ---------- TIMER LOGIC ---------- */
+/* ---------- TIMER ---------- */
 const WORK = 25 * 60;
 const BREAK = 5 * 60;
 
@@ -204,6 +214,7 @@ const timer = document.getElementById("timer");
 const modeText = document.getElementById("modeText");
 const dot = document.getElementById("dot");
 const card = document.getElementById("card");
+const bg = document.getElementById("bg");
 
 function fmt(s){
   return String(Math.floor(s/60)).padStart(2,"0") + ":" +
@@ -214,12 +225,14 @@ function render(){
   timer.textContent = fmt(seconds);
   if(onBreak){
     modeText.textContent = "BREAK";
-    dot.style.background = "#7bdcb5";
-    dot.style.boxShadow = "0 0 0 6px rgba(123,220,181,.2)";
+    dot.style.background = "var(--mint)";
+    dot.style.boxShadow = "0 0 0 6px rgba(123,220,181,.25)";
+    bg.classList.add("break");
   }else{
     modeText.textContent = "WORK";
-    dot.style.background = "#ff7eb6";
-    dot.style.boxShadow = "0 0 0 6px rgba(255,126,182,.2)";
+    dot.style.background = "var(--pink)";
+    dot.style.boxShadow = "0 0 0 6px rgba(255,126,182,.25)";
+    bg.classList.remove("break");
   }
 }
 
@@ -234,7 +247,6 @@ function beep(freq,dur){
   g.gain.value=.05;
   o.start(); o.stop(audioCtx.currentTime+dur);
 }
-
 function resetSound(){
   beep(740,.07); setTimeout(()=>beep(990,.07),90);
 }
@@ -284,3 +296,4 @@ render();
 </script>
 </body>
 </html>
+
