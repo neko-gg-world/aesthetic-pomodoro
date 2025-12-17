@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Aesthetic Pomodoro 🍓</title>
 
-  <!-- Share preview (OpenGraph / Twitter) -->
-  <meta name="description" content="Aesthetic Pomodoro timer 🍓 Cozy focus + cute breaks." />
+  <!-- Share preview -->
+  <meta name="description" content="Aesthetic Pomodoro 🍓 Cozy focus + cute breaks." />
   <meta property="og:title" content="Aesthetic Pomodoro 🍓" />
   <meta property="og:description" content="Cozy focus timer with cute breaks + hydration reminder 🐹💧" />
   <meta property="og:type" content="website" />
@@ -33,53 +33,354 @@
       --card: rgba(255,255,255,.76);
       --shadow: 0 25px 80px rgba(0,0,0,.15);
 
-      /* overlays */
-      --overlay-work: rgba(255,245,248,.85);
-      --overlay-break: rgba(235,255,245,.85);
+      /* WORK/BREAK overlay bases (light) */
+      --overlay-work: rgba(255,245,248,.84);
+      --overlay-break: rgba(235,255,245,.84);
 
-      /* night mode overlays */
-      --overlay-work-night: rgba(20,18,30,.65);
-      --overlay-break-night: rgba(16,28,24,.65);
+      /* Gradient aura overlay (light) */
+      --aura1: rgba(255, 126, 182, .28);
+      --aura2: rgba(210, 190, 255, .26);
+      --aura3: rgba(255, 230, 180, .22);
 
-      --border-night: rgba(255,255,255,.14);
-      --card-night: rgba(20,18,30,.55);
-      --text-night: #f2f2f6;
+      /* Night theme */
+      --text-night:#f2f2f6;
       --muted-night:#b7b7c4;
+      --border-night: rgba(255,255,255,.14);
+      --card-night: rgba(20,18,30,.56);
       --soft-night: rgba(255,255,255,.10);
       --softHover-night: rgba(255,255,255,.16);
       --shadow-night: 0 25px 90px rgba(0,0,0,.45);
+      --overlay-work-night: rgba(20,18,30,.66);
+      --overlay-break-night: rgba(16,28,24,.66);
+      --aura1-night: rgba(255, 126, 182, .18);
+      --aura2-night: rgba(140, 120, 255, .18);
+      --aura3-night: rgba(255, 200, 140, .14);
+
+      /* Warm sunset theme */
+      --text-sunset:#2b2018;
+      --muted-sunset:#6a5448;
+      --border-sunset: rgba(255, 170, 120, .28);
+      --card-sunset: rgba(255, 252, 246, .74);
+      --soft-sunset: rgba(255, 233, 220, .55);
+      --softHover-sunset: rgba(255, 220, 200, .70);
+      --shadow-sunset: 0 28px 90px rgba(120, 60, 20, .20);
+      --overlay-work-sunset: rgba(255, 240, 225, .78);
+      --overlay-break-sunset: rgba(238, 255, 245, .78);
+      --aura1-sunset: rgba(255, 140, 90, .26);
+      --aura2-sunset: rgba(255, 126, 182, .18);
+      --aura3-sunset: rgba(255, 220, 150, .26);
+
+      --glow-pink: 0 14px 35px rgba(255,126,182,.30);
+      --glow-mint: 0 14px 35px rgba(123,220,181,.26);
     }
 
+    *{ box-sizing:border-box; }
     body{
       margin:0;
       min-height:100vh;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color: var(--text);
       overflow:hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* background layer */
+    /* Background container */
     .bg{
       position:fixed;
       inset:0;
-      z-index:-1;
+      z-index:-2;
       background:
         linear-gradient(var(--overlay-work), var(--overlay-work)),
         url("bg.jpg") center / cover no-repeat fixed;
       transition: background .6s ease;
     }
-
     .bg.break{
       background:
         linear-gradient(var(--overlay-break), var(--overlay-break)),
         url("bg.jpg") center / cover no-repeat fixed;
     }
 
-    /* night mode */
+    /* Aesthetic aura overlay (soft gradient blobs) */
+    .aura{
+      position:fixed;
+      inset:-80px;
+      z-index:-1;
+      pointer-events:none;
+      filter: blur(28px);
+      opacity:.9;
+      background:
+        radial-gradient(520px 420px at 18% 20%, var(--aura2), transparent 60%),
+        radial-gradient(520px 420px at 84% 26%, var(--aura1), transparent 60%),
+        radial-gradient(600px 520px at 50% 92%, var(--aura3), transparent 60%);
+      animation: floaty 10s ease-in-out infinite;
+      transition: background .6s ease;
+    }
+    @keyframes floaty{
+      0%,100%{ transform: translate(0,0) scale(1); }
+      50%{ transform: translate(16px,-12px) scale(1.03); }
+    }
+
+    /* iOS fix: fixed backgrounds can be janky; override */
+    @supports (-webkit-touch-callout: none){
+      .bg{
+        background-attachment: scroll, scroll;
+      }
+      .bg.break{
+        background-attachment: scroll, scroll;
+      }
+    }
+
+    /* Layout */
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:
+        calc(20px + env(safe-area-inset-top))
+        20px
+        calc(20px + env(safe-area-inset-bottom));
+    }
+
+    .card{
+      width:100%;
+      max-width: 440px;
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      border:2px solid var(--border);
+      border-radius:28px;
+      box-shadow: var(--shadow);
+      padding: 24px 22px 20px;
+      text-align:center;
+      transition: transform .25s ease, box-shadow .25s ease, background .6s ease, border-color .6s ease;
+    }
+    .card:hover{ transform: translateY(-3px); }
+
+    .title{
+      font-size:26px;
+      font-weight:900;
+      letter-spacing:.3px;
+      text-transform: lowercase;
+    }
+    .subtitle{
+      margin: 6px 0 16px;
+      font-size:14px;
+      color: var(--muted);
+    }
+
+    /* Timer + pulse while running */
+    .timer{
+      font-size: clamp(56px, 18vw, 78px);
+      font-weight: 950;
+      letter-spacing: 1px;
+      margin: 8px 0 8px;
+      font-variant-numeric: tabular-nums;
+      transform: translateZ(0);
+    }
+    .timer.pulsing{
+      animation: breathe 1.6s ease-in-out infinite;
+    }
+    @keyframes breathe{
+      0%,100%{ transform: scale(1); }
+      50%{ transform: scale(1.02); }
+    }
+
+    .modeRow{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      margin-bottom: 14px;
+      flex-wrap:wrap;
+    }
+
+    .modePill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#ffffffaa;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.5px;
+      transition: transform .2s ease;
+    }
+    .modePill:hover{ transform: translateY(-1px); }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background: var(--pink);
+      box-shadow:0 0 0 6px rgba(255,126,182,.22);
+      transition: box-shadow .4s ease, background .4s ease;
+    }
+
+    /* Hamster reaction chip */
+    .hamster{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#ffffffaa;
+      font-size:13px;
+      font-weight:800;
+      color: var(--muted);
+      user-select:none;
+    }
+    .hamster b{
+      color: var(--text);
+      font-weight:900;
+    }
+    .hamster .emoji{
+      font-size:16px;
+      line-height:1;
+      display:inline-block;
+    }
+    .hamster.bounce .emoji{
+      animation: bounce .55s ease;
+    }
+    @keyframes bounce{
+      0%{ transform: translateY(0); }
+      35%{ transform: translateY(-6px); }
+      70%{ transform: translateY(0); }
+      100%{ transform: translateY(-2px); }
+    }
+
+    /* Buttons */
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin: 10px 0 12px;
+    }
+
+    button{
+      border:none;
+      height: 52px;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 16px;
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .2s ease, background .2s ease, filter .2s ease;
+    }
+    button:active{ transform: scale(.97); }
+
+    .primary{
+      background: var(--pink);
+      color:white;
+    }
+    .primary:hover{
+      background: var(--pinkHover);
+      box-shadow: var(--glow-pink);
+      transform: translateY(-1px);
+    }
+
+    .soft{
+      background: var(--soft);
+      color: var(--text);
+    }
+    .soft:hover{
+      background: var(--softHover);
+      box-shadow: 0 14px 35px rgba(40,20,60,.10);
+      transform: translateY(-1px);
+    }
+
+    .reset{
+      width:100%;
+      background: white;
+      border: 2px solid var(--border);
+      color: var(--text);
+      box-shadow: none;
+      height: 52px;
+    }
+    .reset:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 35px rgba(40,20,60,.10);
+      filter: saturate(1.02);
+    }
+
+    /* Meta row */
+    .meta{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      font-size:12px;
+      color: var(--muted);
+      flex-wrap:wrap;
+    }
+
+    .pillSmall{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #ffffffaa;
+      font-weight: 900;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .pillSmall:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 35px rgba(40,20,60,.10);
+    }
+
+    .footer{
+      margin-top: 14px;
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.4;
+    }
+
+    .shake{ animation: shake .25s; }
+    @keyframes shake{
+      0%,100%{ transform: translateX(0); }
+      25%{ transform: translateX(-6px); }
+      75%{ transform: translateX(6px); }
+    }
+
+    /* Night theme overrides */
     body.night{
       color: var(--text-night);
     }
-
+    body.night .card{
+      background: var(--card-night);
+      border-color: var(--border-night);
+      box-shadow: var(--shadow-night);
+    }
+    body.night .subtitle,
+    body.night .meta,
+    body.night .footer,
+    body.night .hamster{
+      color: var(--muted-night);
+    }
+    body.night .hamster b{ color: var(--text-night); }
+    body.night .modePill,
+    body.night .pillSmall,
+    body.night .hamster{
+      border-color: var(--border-night);
+      background: rgba(255,255,255,.08);
+    }
+    body.night .soft{
+      background: var(--soft-night);
+      color: var(--text-night);
+    }
+    body.night .soft:hover{
+      background: var(--softHover-night);
+    }
+    body.night .reset{
+      background: rgba(255,255,255,.08);
+      border-color: var(--border-night);
+      color: var(--text-night);
+    }
     body.night .bg{
       background:
         linear-gradient(var(--overlay-work-night), var(--overlay-work-night)),
@@ -90,221 +391,75 @@
         linear-gradient(var(--overlay-break-night), var(--overlay-break-night)),
         url("bg.jpg") center / cover no-repeat fixed;
     }
-
-    .wrap{
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      padding:20px;
+    body.night .aura{
+      background:
+        radial-gradient(520px 420px at 18% 20%, var(--aura2-night), transparent 60%),
+        radial-gradient(520px 420px at 84% 26%, var(--aura1-night), transparent 60%),
+        radial-gradient(600px 520px at 50% 92%, var(--aura3-night), transparent 60%);
     }
 
-    .card{
-      width:100%;
-      max-width:420px;
-      background: var(--card);
-      backdrop-filter: blur(16px);
-      border:2px solid var(--border);
-      border-radius:28px;
-      box-shadow: var(--shadow);
-      padding:26px 22px;
-      text-align:center;
-      transition:.25s;
+    /* Sunset theme overrides */
+    body.sunset{
+      color: var(--text-sunset);
+    }
+    body.sunset .card{
+      background: var(--card-sunset);
+      border-color: var(--border-sunset);
+      box-shadow: var(--shadow-sunset);
+    }
+    body.sunset .subtitle,
+    body.sunset .meta,
+    body.sunset .footer,
+    body.sunset .hamster{
+      color: var(--muted-sunset);
+    }
+    body.sunset .hamster b{ color: var(--text-sunset); }
+    body.sunset .modePill,
+    body.sunset .pillSmall,
+    body.sunset .hamster{
+      border-color: var(--border-sunset);
+      background: rgba(255,255,255,.70);
+    }
+    body.sunset .soft{
+      background: var(--soft-sunset);
+      color: var(--text-sunset);
+    }
+    body.sunset .soft:hover{
+      background: var(--softHover-sunset);
+    }
+    body.sunset .reset{
+      background: rgba(255,255,255,.72);
+      border-color: var(--border-sunset);
+      color: var(--text-sunset);
+    }
+    body.sunset .bg{
+      background:
+        linear-gradient(var(--overlay-work-sunset), var(--overlay-work-sunset)),
+        url("bg.jpg") center / cover no-repeat fixed;
+    }
+    body.sunset .bg.break{
+      background:
+        linear-gradient(var(--overlay-break-sunset), var(--overlay-break-sunset)),
+        url("bg.jpg") center / cover no-repeat fixed;
+    }
+    body.sunset .aura{
+      background:
+        radial-gradient(520px 420px at 18% 20%, var(--aura2-sunset), transparent 60%),
+        radial-gradient(520px 420px at 84% 26%, var(--aura1-sunset), transparent 60%),
+        radial-gradient(600px 520px at 50% 92%, var(--aura3-sunset), transparent 60%);
     }
 
-    body.night .card{
-      background: var(--card-night);
-      border-color: var(--border-night);
-      box-shadow: var(--shadow-night);
-    }
-
-    .card:hover{ transform: translateY(-3px); }
-
-    .title{
-      font-size:26px;
-      font-weight:850;
-      text-transform: lowercase;
-      letter-spacing:.3px;
-    }
-
-    .subtitle{
-      font-size:14px;
-      color: var(--muted);
-      margin: 6px 0 18px;
-    }
-    body.night .subtitle{ color: var(--muted-night); }
-
-    .timer{
-      font-size: clamp(56px, 18vw, 76px);
-      font-weight: 950;
-      letter-spacing: 1px;
-      margin: 10px 0 6px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .modeRow{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-      margin-bottom:18px;
-    }
-
-    .mode{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 14px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:#ffffffaa;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.5px;
-    }
-
-    body.night .mode{
-      border-color: var(--border-night);
-      background: rgba(255,255,255,.08);
-    }
-
-    .dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background: var(--pink);
-      box-shadow:0 0 0 6px rgba(255,126,182,.22);
-    }
-
-    /* heart that pulses on break */
-    .heart{
-      width:34px;
-      height:34px;
-      border-radius:999px;
-      display:grid;
-      place-items:center;
-      border:1px solid var(--border);
-      background:#ffffffaa;
-      user-select:none;
-      opacity:.85;
-      transform: translateY(0);
-    }
-    body.night .heart{
-      border-color: var(--border-night);
-      background: rgba(255,255,255,.08);
-    }
-
-    .heart span{ font-size:16px; line-height:1; }
-    .heart.pulse{
-      animation: pulse 1.1s ease-in-out infinite;
-    }
-    @keyframes pulse{
-      0%,100%{ transform: scale(1); }
-      50%{ transform: scale(1.12); }
-    }
-
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
-
-    button{
-      border:none;
-      height:50px;
-      border-radius:16px;
-      font-weight:800;
-      font-size:16px;
-      cursor:pointer;
-      transition:.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    button:active{ transform: scale(.97); }
-
-    .primary{
-      background: var(--pink);
-      color:white;
-    }
-    .primary:hover{ background: var(--pinkHover); }
-
-    .soft{
-      background: var(--soft);
-      color: var(--text);
-    }
-    .soft:hover{ background: var(--softHover); }
-
-    body.night .soft{
-      background: var(--soft-night);
-      color: var(--text-night);
-    }
-    body.night .soft:hover{
-      background: var(--softHover-night);
-    }
-
-    .reset{
-      width:100%;
-      background:white;
-      border:2px solid var(--border);
-      color: var(--text);
-    }
-    body.night .reset{
-      background: rgba(255,255,255,.08);
-      border-color: var(--border-night);
-      color: var(--text-night);
-    }
-
-    .meta{
-      margin-top: 14px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      font-size:12px;
-      color: var(--muted);
-    }
-    body.night .meta{ color: var(--muted-night); }
-
-    .pillSmall{
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #ffffffaa;
-      font-weight:800;
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      cursor:pointer;
-      user-select:none;
-    }
-    body.night .pillSmall{
-      border-color: var(--border-night);
-      background: rgba(255,255,255,.08);
-    }
-
-    .footer{
-      margin-top:16px;
-      font-size:12px;
-      color: var(--muted);
-      line-height:1.4;
-    }
-    body.night .footer{ color: var(--muted-night); }
-
-    .shake{ animation: shake .25s; }
-    @keyframes shake{
-      0%,100%{ transform: translateX(0); }
-      25%{ transform: translateX(-6px); }
-      75%{ transform: translateX(6px); }
-    }
-
-    /* mobile tweak */
+    /* Small height devices: hide subtitle to prevent crowding */
     @media (max-height:700px){
       .subtitle{ display:none; }
+      .card{ padding-top:20px; }
     }
   </style>
 </head>
 
 <body>
   <div class="bg" id="bg"></div>
+  <div class="aura" id="aura"></div>
 
   <div class="wrap">
     <div class="card" id="card">
@@ -314,11 +469,15 @@
       <div class="timer" id="timer">25:00</div>
 
       <div class="modeRow">
-        <div class="mode">
+        <div class="modePill">
           <span class="dot" id="dot"></span>
           <span id="modeText">WORK</span>
         </div>
-        <div class="heart" id="heart" title="break vibes"><span>💗</span></div>
+
+        <div class="hamster" id="hamster">
+          <span class="emoji" id="hamEmoji">🐹</span>
+          <span id="hamText">ready to focus</span>
+        </div>
       </div>
 
       <div class="row">
@@ -330,6 +489,7 @@
 
       <div class="meta">
         <div id="sessionsText">Pomodoros today: 0</div>
+        <div class="pillSmall" id="themeBtn">Theme: Night 🌙</div>
         <div class="pillSmall" id="shareBtn">Share ✨</div>
       </div>
 
@@ -352,23 +512,90 @@
     let interval = null;
 
     // ---------- ELEMENTS ----------
+    const bgEl = document.getElementById("bg");
     const timerEl = document.getElementById("timer");
     const modeTextEl = document.getElementById("modeText");
     const dotEl = document.getElementById("dot");
     const cardEl = document.getElementById("card");
-    const bgEl = document.getElementById("bg");
-    const heartEl = document.getElementById("heart");
+
+    const hamsterEl = document.getElementById("hamster");
+    const hamEmojiEl = document.getElementById("hamEmoji");
+    const hamTextEl = document.getElementById("hamText");
+
     const sessionsTextEl = document.getElementById("sessionsText");
+    const themeBtn = document.getElementById("themeBtn");
     const shareBtn = document.getElementById("shareBtn");
 
-    // ---------- NIGHT MODE (auto) ----------
-    function applyNightMode(){
-      const h = new Date().getHours();
-      const isNight = (h >= 19 || h < 7); // 7pm - 7am
-      document.body.classList.toggle("night", isNight);
+    // ---------- HELPERS ----------
+    function fmt(s){
+      const m = Math.floor(s/60);
+      const r = s % 60;
+      return `${String(m).padStart(2,"0")}:${String(r).padStart(2,"0")}`;
     }
-    applyNightMode();
-    setInterval(applyNightMode, 60_000); // re-check every minute
+
+    function hamSay(emoji, text){
+      hamEmojiEl.textContent = emoji;
+      hamTextEl.innerHTML = text;
+      hamsterEl.classList.remove("bounce");
+      void hamsterEl.offsetWidth; // restart animation
+      hamsterEl.classList.add("bounce");
+    }
+
+    function setModeUI(){
+      if(onBreak){
+        modeTextEl.textContent = "BREAK";
+        dotEl.style.background = "var(--mint)";
+        dotEl.style.boxShadow = "0 0 0 6px rgba(123,220,181,.25)";
+        bgEl.classList.add("break");
+      }else{
+        modeTextEl.textContent = "WORK";
+        dotEl.style.background = "var(--pink)";
+        dotEl.style.boxShadow = "0 0 0 6px rgba(255,126,182,.25)";
+        bgEl.classList.remove("break");
+      }
+    }
+
+    function setRunningUI(){
+      if(running){
+        timerEl.classList.add("pulsing");
+      }else{
+        timerEl.classList.remove("pulsing");
+      }
+    }
+
+    function render(){
+      timerEl.textContent = fmt(seconds);
+      setModeUI();
+      setRunningUI();
+    }
+
+    // ---------- THEME TOGGLE (Night 🌙 ↔ Sunset 🌅) ----------
+    // Stored in localStorage so it stays for your friend too.
+    const THEME_KEY = "pomodoro_theme_v1"; // "night" or "sunset"
+
+    function applyTheme(theme){
+      document.body.classList.remove("night","sunset");
+      document.body.classList.add(theme);
+      themeBtn.textContent = theme === "night" ? "Theme: Night 🌙" : "Theme: Sunset 🌅";
+      localStorage.setItem(THEME_KEY, theme);
+    }
+
+    function initTheme(){
+      const saved = localStorage.getItem(THEME_KEY);
+      if(saved === "night" || saved === "sunset"){
+        applyTheme(saved);
+        return;
+      }
+      // default: choose based on time
+      const h = new Date().getHours();
+      const auto = (h >= 19 || h < 7) ? "night" : "sunset";
+      applyTheme(auto);
+    }
+
+    themeBtn.addEventListener("click", () => {
+      const isNight = document.body.classList.contains("night");
+      applyTheme(isNight ? "sunset" : "night");
+    });
 
     // ---------- DAILY SESSION COUNTER ----------
     function todayKey(){
@@ -379,9 +606,9 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
-    const STORAGE_KEY = "pomodoro_daily_sessions_v1";
+    const STORAGE_KEY = "pomodoro_daily_sessions_v2";
 
-    function getDailySessions(){
+    function getDaily(){
       try{
         const raw = localStorage.getItem(STORAGE_KEY);
         if(!raw) return { date: todayKey(), count: 0 };
@@ -393,44 +620,16 @@
       }
     }
 
-    function setDailySessions(count){
-      const payload = { date: todayKey(), count: count };
+    function setDaily(count){
+      const payload = { date: todayKey(), count };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       sessionsTextEl.textContent = `Pomodoros today: ${count}`;
     }
 
-    let daily = getDailySessions();
-    setDailySessions(daily.count);
+    let daily = getDaily();
+    setDaily(daily.count);
 
-    // ---------- HELPERS ----------
-    function fmt(s){
-      const m = Math.floor(s/60);
-      const r = s % 60;
-      return `${String(m).padStart(2,"0")}:${String(r).padStart(2,"0")}`;
-    }
-
-    function setModeUI(){
-      if(onBreak){
-        modeTextEl.textContent = "BREAK";
-        dotEl.style.background = "var(--mint)";
-        dotEl.style.boxShadow = "0 0 0 6px rgba(123,220,181,.25)";
-        bgEl.classList.add("break");
-        heartEl.classList.add("pulse");
-      }else{
-        modeTextEl.textContent = "WORK";
-        dotEl.style.background = "var(--pink)";
-        dotEl.style.boxShadow = "0 0 0 6px rgba(255,126,182,.25)";
-        bgEl.classList.remove("break");
-        heartEl.classList.remove("pulse");
-      }
-    }
-
-    function render(){
-      timerEl.textContent = fmt(seconds);
-      setModeUI();
-    }
-
-    // ---------- SOUNDS (no files) ----------
+    // ---------- SOUNDS (no audio files) ----------
     let audioCtx;
 
     function beep({freq=880, duration=0.09, volume=0.05, type="sine"} = {}){
@@ -466,25 +665,35 @@
     function tick(){
       if(!running) return;
 
-      // keep daily counter fresh across midnight
-      const current = getDailySessions();
+      // handle midnight reset
+      const current = getDaily();
       if(current.date !== daily.date){
         daily = current;
-        setDailySessions(daily.count);
+        setDaily(daily.count);
       }
 
       if(seconds <= 0){
         doneSound();
 
-        // If we finished a WORK session -> count a pomodoro
         if(!onBreak){
           daily.count += 1;
-          setDailySessions(daily.count);
+          setDaily(daily.count);
         }
 
+        // switch mode
         onBreak = !onBreak;
         seconds = onBreak ? BREAK : WORK;
+        running = false; // stop after switching (feels calmer)
+        clearInterval(interval);
+        interval = null;
+
         render();
+
+        if(onBreak){
+          hamSay("🧃🐹", "break time — sip water");
+        }else{
+          hamSay("🐹✨", "back to focus");
+        }
         return;
       }
 
@@ -498,11 +707,19 @@
       if(seconds <= 0){
         cardEl.classList.remove("shake"); void cardEl.offsetWidth;
         cardEl.classList.add("shake");
+        hamSay("🐹😵", "no time left bestie");
         return;
       }
 
       running = true;
       interval = setInterval(tick, 1000);
+      render();
+
+      if(onBreak){
+        hamSay("🐹🍵", "chillin…");
+      }else{
+        hamSay("🐹📚", "locked in");
+      }
     }
 
     function pause(){
@@ -511,6 +728,8 @@
         clearInterval(interval);
         interval = null;
       }
+      render();
+      hamSay("🐹⏸️", "paused — breathe");
     }
 
     function reset(){
@@ -519,6 +738,7 @@
       seconds = WORK;
       render();
       resetSound();
+      hamSay("🐹🔁", "reset — we got this");
     }
 
     // ---------- SHARE ----------
@@ -534,17 +754,20 @@
           setTimeout(()=>shareBtn.textContent = "Share ✨", 1200);
         }
       }catch{
-        // user cancelled share; do nothing
+        // user cancelled
       }
     }
 
-    // ---------- HOOK UP BUTTONS ----------
+    // ---------- HOOK UP ----------
     document.getElementById("startBtn").addEventListener("click", start);
     document.getElementById("pauseBtn").addEventListener("click", pause);
     document.getElementById("resetBtn").addEventListener("click", reset);
     shareBtn.addEventListener("click", share);
 
+    // ---------- INIT ----------
+    initTheme();
     render();
+    hamSay("🐹", "ready to focus");
   </script>
 </body>
 </html>
