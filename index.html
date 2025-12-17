@@ -1,374 +1,286 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aesthetic Pomodoro 🍓</title>
-  <style>
-    :root{
-      --bg1:#fff5f8;
-      --bg2:#f7f0ff;
-      --card:#ffffffcc;
-      --border:#f3d6e2;
-      --text:#2a2a2a;
-      --muted:#7a7a7a;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aesthetic Pomodoro 🍓</title>
 
-      --pink:#ff7eb6;
-      --pinkHover:#ff6aa9;
+<style>
+:root{
+  --text:#2a2a2a;
+  --muted:#7a7a7a;
+  --pink:#ff7eb6;
+  --pinkHover:#ff6aa9;
+  --border:#f3d6e2;
+  --soft:#f7f1f4;
+  --softHover:#efe6eb;
+}
 
-      --soft:#f7f1f4;
-      --softHover:#efe6eb;
+/* ---------- PAGE ---------- */
+body{
+  margin:0;
+  min-height:100vh;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  color:var(--text);
 
-      --shadow: 0 22px 70px rgba(40, 20, 60, .10);
-    }
+  background:
+    linear-gradient(rgba(255,245,248,0.85), rgba(255,245,248,0.85)),
+    url("bg.jpg") center / cover no-repeat fixed;
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background: radial-gradient(1200px 800px at 20% 20%, var(--bg2), transparent 60%),
-                  radial-gradient(1200px 800px at 80% 30%, #ffe6f1, transparent 60%),
-                  linear-gradient(160deg, var(--bg1), #ffffff);
-      overflow:hidden;
-    }
+  overflow:hidden;
+}
 
-    .blob{
-      position:absolute;
-      width:520px; height:520px;
-      border-radius:50%;
-      filter: blur(40px);
-      opacity:.55;
-      pointer-events:none;
-      animation: floaty 10s ease-in-out infinite;
-      transform: translate3d(0,0,0);
-    }
-    .blob.one{ background:#ffd3e5; left:-180px; top:-160px; animation-duration: 11s; }
-    .blob.two{ background:#dcd0ff; right:-220px; top:40px; animation-duration: 13s; }
-    .blob.three{ background:#ffe6b7; left:40%; bottom:-260px; animation-duration: 12s; opacity:.35; }
+.wrap{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+}
 
-    @keyframes floaty{
-      0%,100%{ transform: translate(0,0) scale(1); }
-      50%{ transform: translate(25px,-18px) scale(1.05); }
-    }
+/* ---------- CARD ---------- */
+.card{
+  width:min(420px, 92vw);
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(16px);
+  border:2px solid var(--border);
+  border-radius:28px;
+  box-shadow:0 25px 80px rgba(0,0,0,.15);
+  padding:28px 26px;
+  text-align:center;
+  transition:.25s;
+}
 
-    .wrap{
-      position:relative;
-      z-index:2;
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      padding:24px;
-    }
+.card:hover{
+  transform: translateY(-3px);
+}
 
-    .card{
-      width:min(420px, 92vw);
-      background: var(--card);
-      backdrop-filter: blur(12px);
-      border: 2px solid var(--border);
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-      padding: 28px 26px;
-      transition: transform .25s ease, box-shadow .25s ease;
-    }
+/* ---------- TEXT ---------- */
+.title{
+  font-size:28px;
+  font-weight:800;
+  text-transform: lowercase;
+}
 
-    .card:hover{
-      transform: translateY(-3px);
-      box-shadow: 0 30px 90px rgba(40, 20, 60, .14);
-    }
+.subtitle{
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:20px;
+}
 
-    .top{
-      text-align:center;
-      margin-bottom: 18px;
-    }
-    .title{
-      font-weight:800;
-      letter-spacing:.2px;
-      font-size: 28px;
-      margin: 6px 0 6px;
-      text-transform: lowercase;
-    }
-    .subtitle{
-      margin:0;
-      color:var(--muted);
-      font-size: 14px;
-    }
+.timer{
+  font-size:76px;
+  font-weight:900;
+  letter-spacing:1px;
+  margin:16px 0 8px;
+  font-variant-numeric: tabular-nums;
+}
 
-    .timer{
-      text-align:center;
-      font-size: 76px;
-      font-weight: 850;
-      letter-spacing: 1px;
-      margin: 16px 0 8px;
-      font-variant-numeric: tabular-nums;
-    }
+.mode{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:#ffffffaa;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:22px;
+}
 
-    .mode{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing:.6px;
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #ffffffa8;
-      transition: transform .2s ease;
-    }
-    .pill:hover{ transform: translateY(-1px); }
-    .dot{
-      width:10px; height:10px; border-radius:50%;
-      background: var(--pink);
-      box-shadow: 0 0 0 6px rgba(255,126,182,.18);
-    }
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--pink);
+  box-shadow:0 0 0 6px rgba(255,126,182,.2);
+}
 
-    .btnRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
+/* ---------- BUTTONS ---------- */
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:12px;
+}
 
-    button{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      font-weight: 750;
-      height: 48px;
-      border-radius: 16px;
-      transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
-      box-shadow: 0 10px 25px rgba(40,20,60,.08);
-    }
-    button:active{ transform: translateY(1px) scale(.99); }
+button{
+  border:none;
+  height:48px;
+  border-radius:16px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.15s;
+}
 
-    .primary{
-      background: var(--pink);
-      color:white;
-    }
-    .primary:hover{
-      background: var(--pinkHover);
-      transform: translateY(-1px);
-      box-shadow: 0 14px 35px rgba(255,126,182,.25);
-    }
+button:active{
+  transform:scale(.98);
+}
 
-    .soft{
-      background: var(--soft);
-      color: var(--text);
-    }
-    .soft:hover{
-      background: var(--softHover);
-      transform: translateY(-1px);
-    }
+.primary{
+  background:var(--pink);
+  color:white;
+}
 
-    .reset{
-      margin-top: 12px;
-      width: 100%;
-      background: #fff;
-      color: var(--text);
-      border: 2px solid var(--border);
-      box-shadow:none;
-    }
-    .reset:hover{
-      transform: translateY(-1px);
-      background:#fff8fb;
-    }
+.primary:hover{
+  background:var(--pinkHover);
+}
 
-    .footer{
-      text-align:center;
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.4;
-    }
+.soft{
+  background:var(--soft);
+}
 
-    .shake{
-      animation: shake .25s ease;
-    }
-    @keyframes shake{
-      0%,100%{ transform: translateX(0); }
-      25%{ transform: translateX(-6px); }
-      75%{ transform: translateX(6px); }
-    }
-  </style>
+.soft:hover{
+  background:var(--softHover);
+}
+
+.reset{
+  width:100%;
+  background:white;
+  border:2px solid var(--border);
+}
+
+/* ---------- FOOTER ---------- */
+.footer{
+  margin-top:18px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.4;
+}
+
+/* ---------- SHAKE ---------- */
+.shake{
+  animation:shake .25s;
+}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  75%{transform:translateX(6px);}
+}
+</style>
 </head>
+
 <body>
-  <div class="blob one"></div>
-  <div class="blob two"></div>
-  <div class="blob three"></div>
+<div class="wrap">
+  <div class="card" id="card">
 
-  <div class="wrap">
-    <div class="card" id="card">
-      <div class="top">
-        <div class="title">pomodoro</div>
-        <p class="subtitle">soft focus • cozy breaks • repeat</p>
-      </div>
+    <div class="title">pomodoro</div>
+    <div class="subtitle">soft focus • cozy breaks • repeat</div>
 
-      <div class="timer" id="timer">25:00</div>
+    <div class="timer" id="timer">25:00</div>
 
-      <div class="mode">
-        <div class="pill" id="pill">
-          <span class="dot" id="dot"></span>
-          <span id="modeText">WORK</span>
-        </div>
-      </div>
-
-      <div class="btnRow">
-        <button class="primary" id="startBtn">Start</button>
-        <button class="soft" id="pauseBtn">Pause</button>
-      </div>
-
-      <button class="reset" id="resetBtn">Reset</button>
-
-      <div class="footer">
-        made with 🍓 + focus<br>
-        <strong>dont forget to get some water after every 25 mins hamster</strong>
-      </div>
+    <div class="mode">
+      <span class="dot" id="dot"></span>
+      <span id="modeText">WORK</span>
     </div>
+
+    <div class="row">
+      <button class="primary" id="startBtn">Start</button>
+      <button class="soft" id="pauseBtn">Pause</button>
+    </div>
+
+    <button class="reset" id="resetBtn">Reset</button>
+
+    <div class="footer">
+      made with 🍓 + focus<br>
+      <strong>dont forget to get some water after every 25 mins hamster</strong>
+    </div>
+
   </div>
+</div>
 
-  <script>
-    const WORK_SECONDS = 25 * 60;
-    const BREAK_SECONDS = 5 * 60;
+<script>
+/* ---------- TIMER LOGIC ---------- */
+const WORK = 25 * 60;
+const BREAK = 5 * 60;
 
-    let secondsLeft = WORK_SECONDS;
-    let running = false;
-    let onBreak = false;
-    let intervalId = null;
+let seconds = WORK;
+let running = false;
+let onBreak = false;
+let interval = null;
 
-    const timerEl = document.getElementById("timer");
-    const modeTextEl = document.getElementById("modeText");
-    const dotEl = document.getElementById("dot");
-    const cardEl = document.getElementById("card");
+const timer = document.getElementById("timer");
+const modeText = document.getElementById("modeText");
+const dot = document.getElementById("dot");
+const card = document.getElementById("card");
 
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const resetBtn = document.getElementById("resetBtn");
+function fmt(s){
+  return String(Math.floor(s/60)).padStart(2,"0") + ":" +
+         String(s%60).padStart(2,"0");
+}
 
-    function formatTime(s){
-      const m = Math.floor(s / 60);
-      const r = s % 60;
-      return `${String(m).padStart(2,"0")}:${String(r).padStart(2,"0")}`;
-    }
+function render(){
+  timer.textContent = fmt(seconds);
+  if(onBreak){
+    modeText.textContent = "BREAK";
+    dot.style.background = "#7bdcb5";
+    dot.style.boxShadow = "0 0 0 6px rgba(123,220,181,.2)";
+  }else{
+    modeText.textContent = "WORK";
+    dot.style.background = "#ff7eb6";
+    dot.style.boxShadow = "0 0 0 6px rgba(255,126,182,.2)";
+  }
+}
 
-    function setModeUI(){
-      if(onBreak){
-        modeTextEl.textContent = "BREAK";
-        dotEl.style.background = "#7bdcb5";
-        dotEl.style.boxShadow = "0 0 0 6px rgba(123,220,181,.18)";
-      }else{
-        modeTextEl.textContent = "WORK";
-        dotEl.style.background = "#ff7eb6";
-        dotEl.style.boxShadow = "0 0 0 6px rgba(255,126,182,.18)";
-      }
-    }
+/* ---------- SOUNDS ---------- */
+let audioCtx;
+function beep(freq,dur){
+  audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.frequency.value=freq;
+  o.connect(g); g.connect(audioCtx.destination);
+  g.gain.value=.05;
+  o.start(); o.stop(audioCtx.currentTime+dur);
+}
 
-    function render(){
-      timerEl.textContent = formatTime(secondsLeft);
-      setModeUI();
-    }
+function resetSound(){
+  beep(740,.07); setTimeout(()=>beep(990,.07),90);
+}
+function doneSound(){
+  beep(660,.1); setTimeout(()=>beep(880,.1),120); setTimeout(()=>beep(990,.14),250);
+}
 
-    // ---- Cute sounds (no audio files) ----
-    let audioCtx = null;
-
-    function ensureAudio(){
-      if(!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if(audioCtx.state === "suspended"){
-        audioCtx.resume();
-      }
-    }
-
-    function beep({freq=880, duration=0.09, type="sine", volume=0.05} = {}){
-      ensureAudio();
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type = type;
-      o.frequency.value = freq;
-      g.gain.value = volume;
-
-      o.connect(g);
-      g.connect(audioCtx.destination);
-
-      const now = audioCtx.currentTime;
-      g.gain.setValueAtTime(volume, now);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      o.start(now);
-      o.stop(now + duration);
-    }
-
-    function playResetSound(){
-      beep({freq: 740, duration: 0.07, type:"sine", volume:0.05});
-      setTimeout(() => beep({freq: 990, duration: 0.07, type:"sine", volume:0.05}), 90);
-    }
-
-    function playDoneSound(){
-      beep({freq: 660, duration: 0.10, type:"triangle", volume:0.05});
-      setTimeout(() => beep({freq: 880, duration: 0.10, type:"triangle", volume:0.05}), 120);
-      setTimeout(() => beep({freq: 990, duration: 0.14, type:"triangle", volume:0.05}), 250);
-    }
-
-    function tick(){
-      if(!running) return;
-
-      if(secondsLeft <= 0){
-        playDoneSound();
-        onBreak = !onBreak;
-        secondsLeft = onBreak ? BREAK_SECONDS : WORK_SECONDS;
-        render();
-        return;
-      }
-
-      secondsLeft -= 1;
-      render();
-    }
-
-    function start(){
-      if(running) return;
-
-      if(secondsLeft <= 0){
-        cardEl.classList.remove("shake");
-        void cardEl.offsetWidth;
-        cardEl.classList.add("shake");
-        return;
-      }
-
-      running = true;
-      intervalId = setInterval(tick, 1000);
-    }
-
-    function pause(){
-      running = false;
-      if(intervalId){
-        clearInterval(intervalId);
-        intervalId = null;
-      }
-    }
-
-    function reset(){
-      pause();
-      onBreak = false;
-      secondsLeft = WORK_SECONDS;
-      render();
-      playResetSound();
-    }
-
-    startBtn.addEventListener("click", start);
-    pauseBtn.addEventListener("click", pause);
-    resetBtn.addEventListener("click", reset);
-
+/* ---------- CONTROLS ---------- */
+function tick(){
+  if(!running) return;
+  if(seconds<=0){
+    doneSound();
+    onBreak=!onBreak;
+    seconds=onBreak?BREAK:WORK;
     render();
-  </script>
+    return;
+  }
+  seconds--;
+  render();
+}
+
+startBtn.onclick=()=>{
+  if(running) return;
+  if(seconds<=0){
+    card.classList.remove("shake"); void card.offsetWidth;
+    card.classList.add("shake"); return;
+  }
+  running=true;
+  interval=setInterval(tick,1000);
+};
+
+pauseBtn.onclick=()=>{
+  running=false;
+  clearInterval(interval);
+};
+
+resetBtn.onclick=()=>{
+  running=false;
+  clearInterval(interval);
+  onBreak=false;
+  seconds=WORK;
+  render();
+  resetSound();
+};
+
+render();
+</script>
 </body>
 </html>
